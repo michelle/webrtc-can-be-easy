@@ -1,0 +1,328 @@
+
+Hi everyone! My name's michelle, as you probably all know.
+
+Now, how many of you have ever heard of WebRTC?
+
+Keep your hands up if you've ever USED Webrtc.
+
+Perfect!
+
+I'm here today to convince you, even if you've never heard of webrtc before or
+have used webrtc before and had a terrible time,  that WebRTC CAN be easy.
+
+A tiny bit about me...
+
+I work at<hr>
+We're based in sunny San Francisco.
+
+At Stripe, our preferred means of instant, important communication is...
+<hr>
+...Google chat.
+<br>
+Now, I don't know if you've ever experienced this, but sometimes hangouts will
+lag. Chats will appear out of order, and often take
+more than 5 seconds [pause for 5 seconds] to be delivered. Sometimes I can't
+even connect (fragment).
+<br>
+We could just turn around and talk to each other face-to-face...
+...but there's no chicken emoji in real life.
+<br>
+Jokes aside, there's something a bit off with how chat works right
+now.
+<br>
+Even though I'm sitting just 10 meters away from my colleagues, my message has
+to travel...
+<hr>
+...all the way to the Google data center in "dowels", Oregon.
+
+[pause]
+<hr>
+  That's over 1000 km away (600 miles).
+
+  <br>
+  My message not only takes time to get to Oregon, once it's there, who knows
+  when the server will decide to send it on its 1000kmlong trip back to SF,
+<hr>
+  Or what's even happening to it on Google's servers?
+  <br>
+
+Why couldn't our messages just travel the 10m between our desks?
+<br>
+With WebRTC, they can :).
+<hr>Well, more specifically a set of APIs that enable peer-to-peer video, audio, and
+data in webRTC clients such as your browser. We'll get into the specifics of these APIs in a bit.
+
+<br>
+Even more specifically, it shifts the paradigm of apps in the browser. We're
+entering a world where clients hold state, and the server never has to touch any
+data.
+<br>
+And you don't even have to worry about data going over the wire. For data going
+over MediaStreams and DataChannels, the IETF webrtc standards draft requires browser to implement end-to-end encryption. All data that go
+over an RTCPeerConnection is secured with something called DTLS, (Datagram Transport Layer Security (DTLS),
+which is) a derivative of SSL. DTLS is standardized and built in to all browsers that support WebRTC. 
+<br>
+And even beyond enabling serverless, peer-to-peer communication, it enables new types of transport in these browsers.
+UDP (which is unreliable transport)--UDP is useful for any application where the
+order and reliability of sending messages doesn't matter as much, such as
+realtime games or video streaming.
+<br>
+It also enables SCTP--which is reliable transport that's speedier and
+more secure than TCP
+<br>
+These are protocols that were never before available before in the browser,<hr>
+and probably one of the reasons why no one's built World of Warcraft in the browser yet.
+
+<hr>
+So how does WebRTC work?
+<hr>This is a very simplified explanation of API, so if something seems magical to
+you, I'll probably fill in the blanks later.
+
+I want to make a p2p connection with another client.
+
+The pseudowebrtc above would run in your browser, which is a webRTC client..
+
+I would first create an RTCPeerConnection object with some configuration object.
+
+At this point I should decide if I want to have a video call or just a text chat over
+DataChannel or even a filesharing session over DataChannel.
+
+If I want to create a data channel, at this point I would call createDataChannel
+on my peer connection object.
+
+If I want to add a mediastream, I can use <code>getUserMedia</code> to access my webcam and
+microphone.
+
+You'll notice that <code>getUserMedia</code> doesn't really seem like it's part of the
+webrtc api. We'll get back to this in a bit, because it's a pretty cool API on
+its own.
+
+Theoretically, there's no reason I can't both create a data channel and add a
+media stream, because another cool feature of PeerConnections is that they can
+multiplex many mediastreams/datachannels.<hr>
+Let's say I want to talk to "you".
+So now that I've decided who I want to talk to and how I'm going to talk to you, I'll create something called an
+"offer".
+
+The format of the offer is called "SDP", or Session Description
+Protocol. SDP doesn't actually deliver any media, but rather serves as a way of
+letting your peer know of your configuration--like the media format or type you want to
+share, or the transport protocol you're using for your data channel.
+<br>
+I record this offer on my peer connection locally using setLocalDescription,
+then magically send it to you.
+<br>
+(typeof offer is RTCSessionDescription)
+<br>
+This means that if you ever add a new stream or change an existing stream on
+your peer connection, we'll have to go through this negotiation process again.
+<hr>
+you, on your client side, then receive my offer.
+<hr>
+And at various points during this process, events for streams and data channels
+would've fired. But at this point they're usable.
+<br>
+
+Whoo, that was a lot  to process. Let's take a break and take a look at
+getUserMedia.
+
+<hr>
+Remember getUserMedia, the API I said was a little different from the others?
+Recall that it is a browser api that is able to take control of your webcam and
+mic.
+<br>
+<code>getUserMedia</code> is actually really interesting, because it can be
+used standalone. It was the first part
+of the WebRTC spec that was available in any browser (as early as Chrome
+21/33/Firefox 17/27) over a year ago, and although is not directly tied to
+PeerConnections and ICE and STUN and all of the cool things, is a gateway to
+WebRTC.
+<hr>
+It also enabled developers to do many cool things with the camera--FaceKat, for
+example, allows you to navigate through something that feels like outer space by
+moving your head.
+<br>
+There are also cool photo filter apps, including one that lets you
+<hr>
+asciify yourself.
+<hr>
+and there's even more you can play around with..
+
+<a href="http://shinydemos.com/getusermedia/">http://shinydemos.com/getusermedia/</a>
+hm. life isn't as colorful as i thought.
+<hr>
+So, offers, answers, local, remote...pretty simple, right? Basically just a
+simple handshake. (We'll get into the missing pieces a bit later.) You don't
+even have to worry about security
+
+<br>
+And theoretically it's all supposed to just work, cross browser, cross plaform,
+
+cross-states-and-provinces
+<br>
+But of course there's a but.
+<br>
+Of course, everything's much better than it was 6,
+even 2 months ago.
+<br>
+But it's still a reality that it's difficult to get a grasp on how this works across browsers,
+depending on how to spec browser implementations are. And then you need to
+support multiple version of the browser--mobile versions.
+<br>
+You need to worry about fallbacks, compatibility, configurations, and browser
+updates that break your code.
+
+<hr>
+In this really cool browser support table from iswebrtcreadyyet.com, you
+can see that there's a lot of red
+and yellow. and these are the parts you really end up pulling your hair over.
+<br>
+the answer is maybe.
+<hr>
+I maintain this library called PeerJS. It's okay-popular, and people use it for
+some real things and it scares me to death sometimes.
+<br>
+
+I'll come back to this again later, but I wanted to take you through a bug that
+someone reported about 2 months ago.
+<hr>
+
+2 months ago, there was an issue filed on PeerJS, where mobile devices on Chrome
+31/32 could not communicate with desktop browsers of the same version.
+
+<br>
+Strange. I got my hands on an android device and checked the chrome flags
+settings. In Chrome 31, SCTP (the correct kind of) transport was indeed behind a flag, so this was
+somewhat expected.
+<hr>
+
+  Here's a picture of that.
+
+  <br>
+#nofilter
+
+<br>
+The story here is that I couldn't figure out how to take a screenshot on an
+android phone.
+<br>
+In less than 2 minutes.
+
+<br>
+I use iPhone.
+<hr>
+  So I search the less searchable equivalent of stackoverflow for webrtc: the
+  webrtc-discuss google
+  group.
+Hmm.
+<br>
+Blue censor bar here knows that it's not supported until 33. Now, I don't know
+who blue censor bar is, and
+<hr>
+I spent a good 10 minutes getting to this page from the last, wrestling to get
+past
+Google plus tipsies and such, but blue censor bar seems legit. It's not working in
+Android. Which means Android is lying to me.
+
+Anyone less jaded than I might hesitate to believe that.
+
+But after months of strangling with standards noncompliance, trying to implement
+webrtc browser interoperability with two browsers that did not have a complete
+implementation, "firefoxisms",
+versions of firefox onyl supporting servers specified by IP address, random breaking
+changes in both browsers, I was more than willing to believe blue censor bar.
+<hr>
+There's just a few missing pieces from earlier; I'll go over them briefly
+because they're probably out of the scope of this talk.
+<hr>
+Could we magically send offers and answers?
+<br>
+Surprise! The peers don't just magically know how to call each other. We need
+what's commonly known as a signalling server to initiate their
+connection. Alas, something needs to relay the offer and answer.
+<br>
+You might be thinking that I've misled you about not needing servers.
+<br>
+
+Well, the configration information is all the signalling server touches. Once the peer connection is
+established, the server no longer plays any role in the data transport.
+
+<hr>
+Now, remember someConfigs, the object that we passed into our RTCPeerConnection?
+<hr>
+even more servers, right?
+
+You'll notice that the two servers passed in are a STUN and a TURN server,
+respectively. Let's talk a bit about what those are.
+<hr>
+
+Some of you probably know about NAT, but I'll explain it briefly. NAT is most simply a sort of IP mask.
+<br>
+It stands for network address translator, and it turns your internal ip address
+(192.168.something.something) to a public IP address.
+<br>
+And of course, the acronyms you'll probably hear a lot in talks about WebRTC
+have to do with how to get past NAT:
+There's STUN (sesion traversal utilities for NAT), TURN (traversal using relay NAT), and
+ICE (interactive connectivity establishment), which is the protocol used by
+WebRTC, which, in conjunction with STUN facilitates NAT traversal.
+
+<br>
+Third-party STUN servers are lightweight and on the public internet. allows application to determine whether its located behind
+a NAT. it sends a message. the stun server responds with the IP address and port of the client, as
+observed from the public internet.
+<br>
+The STUN/ICE method success rate is actually 80%, and in cases where a p2p connection cannot
+be made (technical term: symmetric NAT), you can specify a TURN server URL, which is basically a last-ditch
+effort to try to get data to your peer. If no
+turn server is specified, the connection will simply fail.
+<br>
+These things really add complexity to the simple webrtc flow I showed you
+earlier.
+<br>
+Now I'm going to show you a pretty terrifying picture.
+<hr>
+
+You probably can't read the title of the slide, but it says "Simple Call Flow"
+<br>
+
+This diagram is supposed to represent the smallest set of events and signalling
+required to make a peer to peer connection, but of course, this includes
+interactions with STUN and TURN servers, ICE
+candidate transmission, renegotation of offers when the peer adds a new stream,
+among other things
+<br>
+It's actually really interesting if you want take the time to dive in.
+<br>
+On the first slide of this talk, I said "WebRTC can be easy". And despite all
+the scary things I've just shown you, if you just want to
+do cool things with WebRTC, there are a few libraries out there that'll make
+your life easier.
+<hr>
+
+  There's SimpleWebRTC, which provides a nice API for making media calls.
+
+  <br>
+  There's a newer one called rtc.io, which provides a bunch of smaller modules
+  that facilitate media and data calls. I haven't looked closely at this one myself.
+  <br>
+  Then there's the one I maintain, peerjs, which provides an abstraction layer
+  over peer-to-peer data and media.
+  <br>
+One thing that make open source WebRTC libraries  a bit different from other js libraries is
+that they require a bit of background knowledge about the webrtc apis, which
+can understandably
+seem scary. this makes it so that great developers don't want to contribute as
+much.
+<br>
+but now that you've sat through this talk, i'd like to encourage you to try your hand at
+contributing to some of these libraries! it's an exciting time for webrtc. :)
+
+<hr>
+Demo time! I started made this small webrtc media library a few weeks ago called jQuery.peer. Kinda
+nervous, cause this is the first time I've ever demoed it; just finished the
+(css|documentation) last night. It's ridiculously easy to use, but configurable for most use
+cases i can think of.
+
+<hr>
+Thanks for listening, everyone. I'd love to see what you build!
+

@@ -1,0 +1,14 @@
+@font-face {
+  font-family: 'Reenie Beanie';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Reenie Beanie'), local('ReenieBeanie'), url(./reeniebeenie.woff) format('woff');
+}
+
+@font-face {
+  font-family: 'Kite One';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Kite One'), local('KiteOne-Regular'), url(./kiteone.woff) format('woff');
+}
+
