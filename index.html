@@ -4,7 +4,7 @@
   <head>
     <meta charset="utf-8">
 
-    <title>WebRTC - jQueryTO 2014</title>
+    <title>WebRTC can be easy</title>
 
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <meta name="description" content="Realtime with WebRTC">
@@ -14,6 +14,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link href='http://fonts.googleapis.com/css?family=Tauri|Viga|Roboto+Condensed:300,400,700|Montserrat:400,700|Capriola|Open+Sans:400,700,300|Chivo' rel='stylesheet' type='text/css'>
 
     <link rel="stylesheet" href="css/fonts.css">
     <link rel="stylesheet" href="css/reveal.css">
@@ -49,7 +50,6 @@
 # <strong>WebRTC</strong> <span class="negate">is</span> easy
 ## <div style="margin-left:570px;font-size:120px;-webkit-transform:rotate(7deg);letter-spacing:0;font-family:'Reenie Beanie';text-shadow:1px 1px 0px rgba(0,0,0,0.2);">^</div>
 ## <div style="margin-left: 480px;margin-top:-75px;font-size:120px;-webkit-transform:rotate(7deg);letter-spacing:0;font-family:'Reenie Beanie';text-shadow:1px 1px 0px rgba(0,0,0,0.2);">can be</div>
-
 
           </script>
         </section>
@@ -254,87 +254,90 @@ navigator.getUserMedia({audio: true, video: true}, function(stream) {
         </section>
 
         <section data-background="#4f507f">
-          <pre>
-<code class="javascript fragment" data-fragment-index="0">
+          <pre  data-fragment-index="0">
+<code class="javascript fragment">
 // I want to talk to Blue, so I'll make Blue an offer to chat.
 purpleConnection.createOffer(function(offer) {
           </code></pre>
 
-          <pre>
-<code class="javascript fragment" data-fragment-index="1">
+          <pre  data-fragment-index="1">
+<code class="javascript fragment">
   // I'll save it locally...
   purpleConnection.setLocalDescription(offer, function() {
           </code></pre>
 
-          <pre>
-<code class="javascript fragment" data-fragment-index="2">
+          <pre data-fragment-index="2">
+<code class="javascript fragment">
     // ...and pass it on to Blue.
     magicallySend(offer, blueClient);
 
     // we'll talk about our magical sending apparatus in a bit.
           </code></pre>
 
-          <pre>
-<code class="javascript fragment" data-fragment-index="1">
+          <pre  data-fragment-index="1">
+<code class="javascript fragment">
   }, errorHandler);
           </code></pre>
 
-          <pre>
-<code class="javascript fragment" data-fragment-index="0">
+          <pre  data-fragment-index="0">
+<code class="javascript fragment">
 });
           </code></pre>
 
         </section>
 
         <section data-background="#182457">
-          <pre>
-<code class="javascript fragment" data-fragment-index="1">
+          <pre  data-fragment-index="1">
+<code class="javascript fragment">
 // Blue: I've magically received an offer, and I want to chat.
 
 var blueConnection = new RTCPeerConnection(...);
 
 blueConnection.setRemoteDescription(purpleOffer, function() {
           </code></pre>
-          <pre>
-<code class="javascript fragment" data-fragment-index="2">
+          <pre data-fragment-index="2">
+<code class="javascript fragment">
   // I'll share my own media, but I only want to share video.
   navigator.getUserMedia({video: true}, function(stream) {
     blueConnection.addStream(stream);
           </code></pre>
-          <pre>
-<code class="javascript fragment" data-fragment-index="3">
+          <pre  data-fragment-index="3">
+<code class="javascript fragment">
     blueConnection.createAnswer(function(answer) {
           </code></pre>
 
-          <pre>
-<code class="javascript fragment" data-fragment-index="4">
+          <pre data-fragment-index="4">
+<code class="javascript fragment">
       blueConnection.setLocalDescription(answer, function() {
           </code></pre>
+
+          <div data-fragment-index="5"> 
           <pre>
-<code class="javascript fragment" data-fragment-index="5">
+<code class="javascript fragment">
         magicallySend(answer, purpleClient);
           </code></pre>
 
           <pre>
-<code class="javascript fragment" data-fragment-index="4">
+<code class="javascript fragment">
       }, errorHandler);
           </code></pre>
           <pre>
-<code class="javascript fragment" data-fragment-index="3">
+<code class="javascript fragment">
     });
 
           </code></pre>
 
           <pre>
-<code class="javascript fragment" data-fragment-index="2">
+<code class="javascript fragment">
   });
 
           </code></pre>
 
           <pre>
-<code class="javascript fragment" data-fragment-index="1">
+<code class="javascript fragment">
 }, errorHandler);
           </code></pre>
+        </div>
 
         </section>
 
@@ -408,7 +411,6 @@ And cross-platform, cross-browser, etc.
         </section>
 
         <section data-background="./images/phone.jpg">
-
         </section>
 
         <section data-background="./images/phone.jpg">
@@ -578,9 +580,9 @@ fallback.
 
         </section>
 
-        <section data-markdown>
+        <section data-markdown data-background="#444">
           <script type="text/template">
-## DEMO: <strong>`jquery.peer`</strong>
+## "Write a realtime chat app in just <strong>1 line of code</strong>!!!"
 
 <a href="https://github.com/michelle/jquery.peer">github.com/michelle/jquery.peer</a>
 

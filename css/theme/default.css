@@ -16,8 +16,7 @@
  *********************************************/
 body {
   background: #1c1e20;
-  background-image: radial-gradient(closest-corner,rgba(16,47,70,0) 60%,rgba(16,47,70,0.2)),linear-gradient(108deg,#00396f 10%,#e5e9bf 98%);
-  background-color: #2b2b2b; }
+  background-color: #00396f }
 
 .reveal {
   font-family: "Lato", sans-serif;
