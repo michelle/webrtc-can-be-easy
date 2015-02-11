@@ -51,6 +51,17 @@
 ## <div style="margin-left:570px;font-size:120px;-webkit-transform:rotate(7deg);letter-spacing:0;font-family:'Reenie Beanie';text-shadow:1px 1px 0px rgba(0,0,0,0.2);">^</div>
 ## <div style="margin-left: 480px;margin-top:-75px;font-size:120px;-webkit-transform:rotate(7deg);letter-spacing:0;font-family:'Reenie Beanie';text-shadow:1px 1px 0px rgba(0,0,0,0.2);">can be</div>
 
+
+Note:
+Thanks for the introduction, Chris!
+
+I'm really excited to be here today--this is the first time I've given a talk at a web conference, and I was super nervous, so in the days leading up to today I practiced talking to myself a lot. It feels weird at first, but I think I've gotten a hang of it, somewhat. We'll see. Since I'm pretty used to the flow of doing these talks live, I'll answer any questions that come up at the end.
+
+So, hopefully everyone can see my slides now. For those following along with their own copy of the slides, you'll hopefully be able to see what slide I'm on in the URL bar.
+
+Today, I'll be talking to everyone about a technology called WebRTC: what it is, how it works, and how you can play around with it. If you already know everything about WebRTC, this talk probably won't be too exciting for you.
+
+A lot of people I've talked to before have mentioned finding WebRTC intimidating--in particular, it's a pretty frustrating technology to develop with, and I agree with that on many counts. However, my goal today is to show you all that WebRTC *can be* easy.
           </script>
         </section>
 
@@ -58,48 +69,83 @@
           <center>
             <img src="./images/stripe.png">
           </center>
+<aside class="notes">
+  A little bit about myself, first: I'm a product engineer at a company called Stripe. We build an API and related tools to help developers and businesses process all sorts of payments, from credit card payments to ACH, Alipay to ACH.
+
+<br><Br>
+  We're located...
+</aside>
         </section>
 
         <section data-background="./images/sf.jpg">
+<aside class="notes">
+    We're located in sunny San Francisco, California, and I'm currently in one of our conference rooms. This one's called Zebra, as you can probably tell from the pictures behind me.
+</aside>
         </section>
 
         <section data-background="#fff">
           <img src="./images/chicken.png" style="float:right;" width="400px">
           <img src="./images/connection.png" class="fragment" data-fragment-index="1">
+<aside class="notes">
+  Now, we don't actually use WebRTC here at Stripe, but we do use Google Hangouts for our ultra-time-sensitive communications.
+<br><br>
+I don't know if you've ever experienced this, but oftentimes, Google Hangouts will be pretty laggy.
+
+Chats will appear out of order momentarily, and often take more than 5 seconds to be delivered.
+
+<br><br>
+I wish I had a dime everytime I get this message.
+<br><br>
+
+So, we could just turn around and talk to each other face-to-face, but sometimes I find it hard to express myself fully without being able to use emoji.
+<br><br>
+  Jokes about in-person-communication aside, the way Hangouts works right now doesn't make too much sense when I'm talking to a person who's sitting 20 feet away from me.
+  <br><br>
+  My message has to travel from my computer here in San Francisco, to Stripe's router,  all the way to some.. 
+</aside>
 
         </section>
-
-        <section data-background="#416b85">
-
-          <div class="animation" style="width:600px;position:relative;margin:0 auto">
-<div class="chicken-server">
-          <img src="./images/small_chicken.png">
-        </div>
-<img src="./images/server.png" height="500px">
-        </div>
-        </section>
-
 
         <section data-background="./images/dalles.png">
+<aside class="notes">
+  ..random data center in Dowles, Oregon.
+</aside>
         </section>
 
         <section data-background="./images/distance.png">
+<aside class="notes">
+  That's over 600 miles (or 1000 km) away!
+  <br><br>
+  My message not only takes the time to physically travel across the wire to Oregon, 
+</aside>
         </section>
 
         <section data-background="./images/snowden.jpg">
+<aside class="notes">
+  but once it's there, I no longer have control over what I sent! It's out there. On someone random lurker's (or Google's) server!
+</aside>
         </section>
 
         <section data-background="./images/distance.png">
+<aside class="notes">
+          And after all that, it still needs to make that 600 mile/1000 km journey back to Stripe, where my message will end up 20 feet from where it started.
+</aside>
         </section>
 
         <section data-background="#416b85">
-
           <div class="animation" style="width:600px;position:relative;margin:0 auto">
 <div class="chicken-server">
           <img src="./images/small_chicken.png">
         </div>
 <img src="./images/server.png" height="500px">
         </div>
+<aside class="notes">
+  So, let's see if we can't eliminate some of parts of this process.
+  <br><br>
+  Here's the lifecycle of a Google Hangouts chat message. The chicken emoji represents a chat message that I commonly send, and you can see some third party servers up top.
+
+</aside>
+
         </section>
 
         <section data-markdown data-background="#416b85">
@@ -116,6 +162,13 @@
 
 Well, it's hard. <!-- .element: class="fragment" -->
 
+Note:
+
+Why can't we just send packets directly to each other's networks, if we know our IP addresses?
+
+(fragment) Well, it's hard.
+
+
           </script>
         </section>
 
@@ -130,6 +183,15 @@ Well, it's hard. <!-- .element: class="fragment" -->
 <img src="./images/small_chicken.png">
 </div>
 </div>
+
+Note:
+Some of you probably know much more than I do about NAT, but I'll explain it briefly. NAT is most simply a sort of IP mask.
+
+It stands for network address translator, and it turns your internal ip address
+(192.168.something.something) to a public IP address.
+
+This means that if two browsers want to talk to each other, they have to figure
+out (a) if one or both are behind NAT and (b) what each others' actual IPs are.
 
           </script>
         </section>
@@ -151,16 +213,19 @@ Well, it's hard. <!-- .element: class="fragment" -->
 </div>
 </div>
 
+Note:
+Additionally, even if we were to get past NAT and make a connection, we'd want
+our data to go over the wire securely, so I can't steal your chicken. It's best to have a standard for this,
+rather than rolling your own.
+
+Finally, web browsers have historically used TCP as its transport protocol of
+choice. For many peer-to-peer applications, such as real time games and video
+streams, TCP becomes
+too slow.
+
+The good news is that WebRTC has solved these issues for us.
           </script>
         </section>
-
-        <section data-markdown>
-          <script type="text/template">
-# WebRTC to the rescue!
-
-          </script>
-        </section>
-
 
         <section data-markdown data-transition='fade'>
           <script type="text/template">
@@ -169,6 +234,13 @@ Well, it's hard. <!-- .element: class="fragment" -->
 <img src="./images/chrome.png" width="100px">
 <img src="./images/firefox.png" width="100px"><img src="./images/opera.png" width="100px">
 
+Note:
+WebRTC stands for Web real time communications, and is a set of standardized
+APIs for peer to peer video, audio, and data in the browser.
+
+It's pluginless,
+meaning you can send files and stream media without having to download any apps
+or browser extensions.
           </script>
         </section>
 
@@ -182,6 +254,10 @@ Well, it's hard. <!-- .element: class="fragment" -->
 
 
 
+Note:
+More specifically, it's mainly made of of these three components:
+
+getUsermedia, which you heard about at the Web v. Native talk yesterday.
           </script>
         </section>
 
@@ -195,6 +271,25 @@ End-to-end <strong>security</strong> with DTLS
 
 <img src="./images/small_chicken.png">
 
+Note:
+
+With WebRTC in browsers, there's now built in support for NAT traversal, built in end-to-end encryption with
+DTLS, and new transport protocols available!
+
+What's really cool about WebRTC is that it shifts the paradigm of apps in the browser. We're
+entering a world where the server never has to touch any
+data.
+
+And even beyond that, it's pretty cool that you can now use UDP (which is
+unreliable transport) and SCTP in the browser.
+
+UDP is unreliable transport, and is useful for any application where the
+order and reliability of sending messages doesn't matter as much, such as
+realtime games or video streaming.
+
+SCTP--is reliable transport that's speedier and
+more secure than TCP
+
           </script>
         </section>
 
@@ -202,18 +297,48 @@ End-to-end <strong>security</strong> with DTLS
           <script type="text/template">
 # Demo!
 
+Note:
+Now that your mind is full of all these transport protocols and APIs, let's make them a little less abstract and see a pluginless, WebRTC video chat in action!
+
+(NEXT)
           </script>
+        </section>
+
+        <section data-background="./images/desk.jpg">
+<aside class="notes">
+http://cdn.peerjs.com/demo/videochat/demo.html
+<br><br>
+
+  I've set up a second laptop at my desk. It's a few hundred feet from this conference room, so I hope the connection is fast, or you'll all laugh at me.
+
+<br><br>
+  http://cdn.peerjs.com/demo/videochat/demo.html
+
+<br><br>
+  Okay, so I'll just open up this tab with the demo here...
+  Just gotta allow access to my mic/video, and we'll be able to sneak a peek at what people are talking about around my desk.
+
+<br><br>
+  Hopefully it's nothing too confidential.
+
+<br><br>
+  Whoo! Usually I do this demo with a person on the other end, to prove it's not prerecorded or something. It didn't work out this time, but trust me, it's not prerecorded! I'm actually directly streaming to and from a computer in the other room, without going through any third party server. It's pretty nice quality on my end, but because you may be seeing a stream through a stream, I'm not sure how nice it'll seem.
+</aside>
         </section>
 
         <section data-markdown data-background="#284c7d">
           <script type="text/template">
 ## How did that work?
 
-<div class="fragment">
 ### Let's walk through a simple peer-to-peer chat between <strong><div class="box purple" style="border-radius:5px;margin-bottom:-10px;background-color:#4f507f;border:4px solid #efe574;display:inline-block;width: 40px;height:40px;"></div> and <div class="box purple" style="border-radius:5px;margin-bottom:-10px;background-color:#182457;border:4px solid #efe574;width: 40px;height:40px;display:inline-block;"></div></strong>.
 
-(...a <strong>p2b</strong> chat, you could say...)</div>
-          </script>
+Note:
+
+So, how did that work?
+
+Let's walk through an example chat connection between blue box and purple box.
+
+</script>
         </section>
 
         <section data-background="#4f507f">
@@ -251,6 +376,34 @@ navigator.getUserMedia({audio: true, video: true}, function(stream) {
 </code>
           </pre>
 
+          <aside class="notes">
+
+            What I'm about to explain is a very simplified version of the raw WebRTC API, so if something seems magical right now to you, I'll probably come back and fill in the blanks later.
+            <br><br>
+The pseudowebrtc in the next two slides can all run on the client side, in your browser, which is a webRTC client.
+<br><br>
+I would first create an RTCPeerConnection object with some configuration object.
+
+<br><br>
+At this point I should decide if I want to have a video call or just a text chat over
+DataChannel or even a filesharing session over DataChannel.
+
+<br><br>
+If I want to create a data channel, at this point I would call createDataChannel
+on my peer connection object.
+
+<br><br>
+If I want to add a mediastream, I can use `getUserMedia` to access my webcam and
+microphone.
+
+<br><br>
+You'll notice that the `getUserMedia` sticks out a bit. We'll get back to this in a bit, because it's a pretty cool API on
+its own.
+<br><br>
+Theoretically, there's no reason I can't both create a data channel and add a
+media stream, because another cool feature of PeerConnections is that they can
+multiplex many mediastreams/datachannels.
+            </aside>
         </section>
 
         <section data-background="#4f507f">
@@ -283,6 +436,25 @@ purpleConnection.createOffer(function(offer) {
 <code class="javascript fragment">
 });
           </code></pre>
+
+
+<aside class="notes">
+So now that PURPLE has decided who he want to talk to and how I'm going to talk to you, I'll create something called an
+"offer".
+<br><br>
+The format of the offer is called "SDP", or Session Description
+Protocol. SDP doesn't actually deliver any media, but rather serves as a way of
+letting your peer know of your configuration--like the media format or type you want to
+share, or the transport protocol you're using for your data channel.
+<br><br>
+I record this offer on my peer connection locally using setLocalDescription,
+then magically send it to you.
+<br><br>
+(typeof offer is RTCSessionDescription)
+<br><br>
+This means that if you ever add a new stream or change an existing stream on
+your peer connection, we'll have to go through this negotiation process again.
+</aside>
 
         </section>
 
@@ -338,6 +510,10 @@ blueConnection.setRemoteDescription(purpleOffer, function() {
 }, errorHandler);
           </code></pre>
         </div>
+        <aside class="notes">
+  Blue magically receives purple's offer, and she decides to answer.
+  Blue is a pretty shy, so she's not going to add her camera stream.
+</aside>
 
         </section>
 
@@ -354,6 +530,13 @@ purpleConnection.setRemoteDescription(blueAnswer, function() {
 ```
 
           </script>
+          <aside class="notes">
+And at various points during this process, events for streams and data channels
+would've fired. But at this point they're usable.
+<Br>
+Whoo, that was a lot.
+
+</aside>
         </section>
 
         <section data-markdown>
@@ -362,16 +545,46 @@ purpleConnection.setRemoteDescription(blueAnswer, function() {
 ### Remember <strong>`getUserMedia`</strong>?
 
           </script>
+          <aside class="notes">
+So let's take a bit of a mental break, because we all fell our eyes glazing over
+when we see code on slides.
+
+<br><br>
+Remember getUserMedia, the API I said was a little different from the others?
+Recall that it is a browser api that is able to take control of your webcam and
+mic.
+<br><br>
+You can use `getUserMedia` without even knowing that WebRTC exists.
+<br><br>
+It was the first part
+of the WebRTC spec that was available in any browser
+<br><br>
+and this wassss...as early as Chrome 21/33/Firefox 17/27, which was over 2 years ago
+<br><br>
+although its not directly tied to
+Peer0to-peer connections, its considered a gateway to
+WebRTC because it allowed the PeerConnection API to stream media between to peers very early in its development--data channel support did not come until much later.
+</aside>
         </section>
 
         <section data-markdown data-background="./images/facekat.png">
           <script type="text/template">
 ## "FaceKat"
+          <aside class="notes">
+Before PeerConnection even existed, though, getUserMedia enabled developers to do many cool
+things with the camera, including CV hacks that let you track a hand or a face--FaceKat, for
+example, allows you to navigate through vanilla dipping dots by moving your head.
+<br>
+There are also cool photo filter apps, including one that lets you
+</aside>
           </script>
         </section>
 
         <section data-markdown data-background="./images/ascii.png">
           <script type="text/template">
+<aside class="notes">
+asciify yourself.
+</aside>
           </script>
         </section>
 
@@ -379,6 +592,13 @@ purpleConnection.setRemoteDescription(blueAnswer, function() {
           <script type="text/template">
 ### <a href="http://shinydemos.com/getusermedia/">shinydemos.com/getusermedia</a>
 ### (from Opera)
+
+Note:
+and there's even more you can play around with.
+
+http://shinydemos.com/getusermedia/
+
+Definitely try some of these out when you gte the chance!
         </script></section>
 
         <section data-markdown>
@@ -387,7 +607,42 @@ purpleConnection.setRemoteDescription(blueAnswer, function() {
 
 And cross-platform, cross-browser, etc.
 
+<aside class="notes">
+So, offers, answers, local, remote...pretty simple, right? Basically just a
+simple handshake. <br><br>
+And theoretically it's all supposed to just work, cross browser, cross plaform,
+and have built in security and NAT traversal and UDP
+<br><br>
+But that seems too good to be true.
+<br><br>
+WebRTC is in a much better than it was a year, or even a few months ago.
+<br><br>
+But it's still a reality that it's difficult to get a grasp on how the APIs works across browsers,
+depending on how to spec browser implementations are. And even if you force all
+your users to use Chrome, you have to deal with different version of the
+browser...and mobile versions.
+<br><br>
+
+</aside>
           </script>
+        </section>
+
+
+        <section data-background="#c3655d">
+          <img src="./images/scorecard2.png" style="float:left;margin:0 10px 0 0;width: 70%;">
+          <div class="credit"
+            style="float:left;width:20%;font-size:0.5em;line-height:1em;">iswebrtcreadyyet.com
+        (&yet)</div>
+
+      <aside class="notes">
+In this really cool browser support table from iswebrtcreadyyet.com, you
+can see that there's a lot of red
+and yellow. and these are the parts you really end up pulling your hair over.
+
+They're parts of the API that are not fully up to spec or not interoperable.
+
+</aside>
+
         </section>
 
         <section data-background="#c3655d">
@@ -396,40 +651,111 @@ And cross-platform, cross-browser, etc.
             style="float:left;width:20%;font-size:0.5em;line-height:1em;">iswebrtcreadyyet.com
         (&yet)</div>
 
+      <aside class="notes">
+Compared to the browser scorecard from almost a year ago when I first gave this talk, there's not an amazing amount of growth in percentage of the green portions. A lot of the work on WebRTC in recent months has been in nailing down the API and in supporting a broader range of data channel and media stream options.
+        </aside>
+        </section>
+
+        <section data-background="#c3655d">
+          <img src="./images/mdn1.png">
+          <img src="./images/mdn2.png" class="fragment">
+  <aside class="notes">
+    Similarly, if you try to find info about the webRTC apis on mdn, you might first get a page that tells you that it's outdated...
+    <br><br>
+    and then you'll go to the page they claim to be migrating to, and find this.
+    </aside>
         </section>
 
 
         <section data-markdown data-background="./images/peerjs.png">
           <script type="text/template">
 
+<aside class="notes">
+I wanted to make this whole process less of a pain, so I created and to this day 
+maintain this library called PeerJS. It's okay-popular, and people use it for
+some real things and it scares me to death sometimes.
+<br>
+<br>
+I'll come back to this again later, but I wanted to take you through a pretty memorable bug that I encountered last year.
+</aside>
           </script>
         </section>
 
         <section data-background="#f5f9fc">
 <img src="./images/issue.png">
 
+<aside class="notes">
+
+Last year, there was an issue filed on PeerJS, where mobile devices on Chrome
+31/32 could not communicate with desktop browsers of the same version.
+
+<br><br>
+How strange. So I got my hands on an android device and checked the chrome flags
+settings. </aside>
         </section>
 
         <section data-background="./images/phone.jpg">
+          <aside class="notes">
+
+            In Chrome 31, SCTP transport, the type of transport we wanted to see, because that was what was in desktop browsers, was indeed behind a flag, so this was
+somewhat expected. But even with the flag enabled, I couldn't get a WebRTC connection to be successful
+<br><br>
+The story here is that I couldn't quickly figure out how to take a screenshot on an
+android phone, so I took a picture with my iphone.
+</aside>
         </section>
 
         <section data-background="./images/phone.jpg">
           <img src="./images/ben1.png">
+          <aside class="notes">
+  So I search the equivalent of stackoverflow for webrtc: the
+  webrtc-discuss google
+  group.
+  <br><br>
+  Sorry, less searchable equivalent of stackoverflow.
+  <br><br>
+it appears that Blue censor bar here knows that it's not supported until 33. I don't know
+who blue censor bar is, and
+</aside>
         </section>
 
         <section data-background="./images/ben2.png">
+          <aside class="notes">
+I spent a good 5 minutes getting to this page from the last because google
+groups now has google plus tipsies hanging around
+<br><br>
+but blue censor bar seems legit. It's not working in
+Android. Which means Android is lying to me.
+<br><br>
+Anyone less jaded than I am about WebRTC might hesitate to believe that.
+<br><br>
+But after months of strangling with standards noncompliance, trying to implement
+webrtc browser interoperability with two browsers that did not have a complete
+implementation, "firefoxisms",
+versions of firefox onyl supporting servers specified by IP address, random breaking
+changes in both browsers, I was more than willing to believe blue censor bar.
+</aside>
         </section>
 
         <section data-background="#f5f9fc">
           <img src="./images/stillopen.png">
           <br>
           <a href="https://github.com/peers/peerjs/issues/138">Issue #138</a>
+          <aside class="notes">
+  The bug today? It's closed, but I never fixed it or anything. I wrestled with a few hacks to detect whether
+  SCTP was really enabled, but nothing felt satisfying. Eventually I decided that it wasn't worth the time. Android for Chrome would just roll out their fixes soon anyways. And indeed, now we're on like version 40 of chrome, so it's no longer an issue!
+  
+</aside>
         </section>
 
         <section data-markdown>
           <script type="text/template">
 ## Just a few missing pieces
 
+<aside class="notes">
+There's just a few missing pieces from earlier; I'll go over them briefly
+because they're probably out of the scope of this talk.
+</aside>
 
           </script>
         </section>
@@ -441,6 +767,21 @@ someone)`</span> function from earlier?
 
 It's a function that sends <span style="color:#e8e082">`something`</span> to
 <span style="color:#e8e082">`someone`</span> via a server.
+
+Note:
+Surprise! The peers don't just magically know how to call each other. We need
+what's commonly known as a signalling server to initiate their
+connection. Alas, something needs to relay the offer and answer.
+
+You might be thinking that I've misled you about not needing servers.
+
+Well, the configration information is all the signalling server touches. Once the peer connection is
+established, the server no longer plays any role in the data transport.
+
+
+with one caveat that if you want to add another stream or data channel on yoru
+peer connection, you'll have to renegotiate and go through that offer answer
+process again.
 
           </script>
         </section>
@@ -455,6 +796,10 @@ var someConnection = new RTCPeerConnection(...)
 
 var someDataChannel = someConnection.createDataChannel('CHAT', ...);
 ```
+
+<aside class="notes">
+Now, remember ..., the object that we passed into our RTCPeerConnection constructor, and a separate object that we passed as our createDataChannel options?
+</aside>
 
 
           </script>
@@ -490,6 +835,13 @@ var dcDotDotDot2 = {
   reliable: false
 };
           </code></pre>
+          <aside class="notes">
+even more servers, right?
+
+You'll notice that the two servers passed in are a STUN and a TURN server,
+respectively. Let's talk a bit about what those are.
+</aside>
+          
         </section>
 
         <section data-markdown data-background="#111942">
@@ -506,6 +858,32 @@ you.onicecandidate = function(event) {
 <br>
 STUN servers and ICE allow you to connect to most peers behind NAT. TURN servers are the
 fallback.
+<aside class="notes">
+
+And of course, the acronyms you'll probably hear a lot in talks about WebRTC
+have to do with how to get past NAT:
+There's STUN (sesion traversal utilities for NAT), TURN (traversal using relay NAT), and
+ICE (interactive connectivity establishment), which is the protocol used by
+WebRTC, which, in conjunction with a STUN server facilitates NAT traversal.
+
+
+<br>
+Third-party STUN servers are lightweight and on the public internet. allows application to determine whether its located behind
+a NAT. it sends a message. the stun server responds with the IP address and port of the client, as
+observed from the public internet.
+<br>
+The STUN/ICE method success rate is actually 80%, and in cases where a p2p connection cannot
+be made (technical term: symmetric NAT), you can specify a TURN server URL, which is basically a last-ditch
+effort to try to get data to your peer. If no
+turn server is specified, the connection will simply fail.
+<br>
+
+These things really add complexity to the simple webrtc flow I showed you
+earlier.
+
+Now I'm going to show you a pretty terrifying picture.
+
+</aside>
 
           </script>
         </section>
@@ -515,6 +893,20 @@ fallback.
           <script type="text/template">
 <img src="./images/official.svg">
 <img src="./images/simple.png" class="fragment" style="right: 30px;position:absolute">
+<aside class="notes">
+
+You may or may not be able to read the title of the slide, but it says "Simple Call Flow"
+<br>
+
+This diagram is supposed to represent the smallest set of events and signalling
+required to make a peer to peer connection, but of course, this includes
+interactions with STUN and TURN servers, ICE
+candidate transmission, renegotation of offers when the peer adds a new stream,
+among other things
+<br>
+It's actually really interesting if you want take the time to dive in.
+
+</aside>
           </script>
         </section>
 
@@ -530,6 +922,9 @@ fallback.
 <img src="./images/small_chicken.png">
 </div>
 </div>
+
+Note:
+So now, going back to our original flying chicken example, we've transformed this very simple, aspirational peer-to-peer chicken chat...
 
 
           </script>
@@ -556,6 +951,11 @@ fallback.
 </div>
 </div>
 
+Note:
+Into something a bit more like this.
+
+You've got your offer and answer exchange, and ice candidate exchange, and like 3 different 3rd party servers are involved now. Signaling, STUN, TURN...and in the end your chicken might still go through a 3rd party server if there's a symmetric NAT going on...
+
 
           </script>
         </section>
@@ -566,6 +966,14 @@ fallback.
           <span style="color: #555;text-shadow:none;">(WebRTC <strong
               style="color:#e96151">can
               be</strong> easy, remember?)</span>
+
+          <aside class="notes">
+            So at this point you're probably like, "But the first slide of the talk says that WebRTC can be easy! And all you're doing is scaring me!"
+            <br><br>
+Well, despite all
+the scary things I've just shown you, the good news is that you can play around with WebRTC without understanding any of it. There are a few libraries out there that'll make
+it super easy to prototype quickly with WebRTC. WebRTC is a native browser API like any other, and native browser APIs are often hard to digest without some nice wrappers.
+</aside>
         </section>
 
         <section data-background="#eee" data-transition='fade'>
@@ -577,6 +985,20 @@ fallback.
 <br>
 <img src="./images/peerjs_logo.png" width="300px" class="fragment" data-fragment-index="3">
 </center>
+<aside class="notes">
+  Here are a few that have been around.
+  <br><br>
+  Definitely look some of these up. As I mentioned earlier, I help maintain PeerJS.
+  <br><br>
+  And as a maintainer, one thing I find that make open source WebRTC libraries  a bit different from other js libraries is
+that they require a bit of background knowledge about the webrtc apis, which
+can understandably
+seem scary. this makes it so that great developers, like yourselves, don't tend to contribute as
+much.
+<br>
+but now that you've sat through this talk, i'd like to encourage you to try your hand at
+contributing to some of these libraries! it continues to be a really exciting time for webrtc, and the more folks we have using and contributing to these libraries, the better they can become for everyone.
+  </aside>
 
         </section>
 
@@ -586,9 +1008,49 @@ fallback.
 
 <a href="https://github.com/michelle/jquery.peer">github.com/michelle/jquery.peer</a>
 
+Note:
+Time for a final demo!
+
+This is a small WebRTC videochat library I made last year called jQuery.peer. 
+
+I made this jQuery plugin right before I first gave this talk beacuse I wanted to show off just how easy WebRTC *can* be if we all contributed to these nice little WebRTC wrappers.
+
+Back when realtime was all the rage, there were all these demos that were like, "build a realtime chat room in 5 lines of code!" and so since WebRTC is also all about realtime, I felt compelled to one-up them.
+
+jquery.peer is built on top of PeerJS, so the scary server components that we previously went over are all taken care of
+by the PeerJS cloud server.
+
+---
+
+Here on the left, in my HTML, I import PeerJS, jquery.peer, and jquery. The only element I add to my markup is one with an id of "videochat"
+
+which I'll then select in my javascript.
+
+```
+   $('#videochat').peer({id: 'mbu', room: 'jssummit'});
+```
+
+So, I've gone ahead and add my one line of code and I've connected to the jssummit room. I should be once again able to connect to my desk!
+
+http://jsbin.com/kutigewogo/1/edit?html,js,output
+
+
           </script>
         </section>
 
+        <section data-markdown data-background="#444">
+          <script type="text/template">
+## Join in!
+
+<a href="http://cdn.peerjs.com/jquery.peer">cdn.peerjs.com/jquery.peer</a>
+
+Note:
+If you want to join in on the demo, you can visit the link above.
+
+If you have trouble connecting, it's often due to company firewalls.
+
+          </script>
+        </section>
 
 
 
@@ -600,7 +1062,15 @@ fallback.
 
 <a href="https://twitter.com/hazelcough">@hazelcough</a> on Twitter
 
-<a href="mailto:michelle@stripe.com">michelle@stripe.com</a>
+<a href="mailto:michelle@stripe.com">michelle@michellebu.com</a>
+
+Note:
+
+That's all!
+
+Thanks for listening, everyone, and thanks to Chris/Ari for organizing and keeping track of questions. I'll go through see if I can't answer a few of these, now.
+
+If I don't get around to yours, or somehow miss it, feel free to tweet at me, or shoot me an email.
 
           </script>
         </section>
